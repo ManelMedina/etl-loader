@@ -1,0 +1,7 @@
+.*.swp
+GeoLite2-City.mmdb
+build/
+new.table-v4.txt.*
+new.table-v6.txt.*
+table-v4.txt
+table-v6.txt
