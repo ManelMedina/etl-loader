@@ -1,5 +1,4 @@
 #!/bin/sh
-cd /home/aaron/aggregate-it/
 
 DOW=`date +%a`
 
