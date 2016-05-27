@@ -9,7 +9,7 @@
 #  4 | opensnmp
 #  5 | openssdp
 
-declare -A risks=( ["1"]="opendns" ["2"]="openntp" ["3"]="opensnmp" ["4"]="openssdp" )
+declare -A risks=( ["1"]="opendns" ["2"]="openntp" ["3"]="spam" ["4"]="opensnmp" ["5"]="openssdp" )
 
 for rid in ${!risks[@]}; do 
 	val=${risks[$rid]}
@@ -21,7 +21,7 @@ for rid in ${!risks[@]}; do
 
 	# by country, monthly
 	outfile="$val-place-monthly.csv"
-	echo "select  date_trunc('month', ts) as date, \"place.cc\" as country, count(*) as value  from hits where risk_id=$rid group by date,country order by value desc;" | \
+	echo "select  date(date_trunc('month', ts)) as date, \"place.cc\" as country, count(*) as value  from hits where risk_id=$rid group by date,country order by value desc;" | \
 		psql -t -F"," -A iphistory > $outfile
 
 	# by ASN, annual
@@ -31,7 +31,7 @@ for rid in ${!risks[@]}; do
 
 	# by ASN, monthly
 	outfile="$val-asn-monthly.csv"
-	echo "select  date_trunc('month', ts) as date, asn as asn, count(*) as value  from hits where risk_id=$rid group by date,asn order by value desc;" | \
+	echo "select  date(date_trunc('month', ts)) as date, asn as asn, count(*) as value  from hits where risk_id=$rid group by date,asn order by value desc;" | \
 		psql -t -F"," -A iphistory > $outfile
 done
 
