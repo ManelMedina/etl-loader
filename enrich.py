@@ -87,16 +87,16 @@ if verbose:
 # parse main file
 #
 csvreader = csv.reader(infile, delimiter=',', quotechar="'")
+csvwriter = csv.writer(sys.stdout, delimiter=',', quotechar="'") #, quoting=csv.QUOTE_MINIMAL)
 for line in csvreader:
     ip = line[col]
-    if verbose: print("ip={}".format(ip))
+    #if verbose: print("ip={}".format(ip))
     ip = ip.strip()
     if ip:
         rnode = tree.search_best(ip.strip())
         response = reader.city(ip)
         line.append(rnode.data['origin'])
         line.append(response.country.iso_code)
-        try:
-            print("{line}{sep}{asn}{sep}{cc}".format(sep=sep, line=linein(","), asn=rnode.data['origin'], cc=response.country.iso_code))
-        except AttributeError:
-            print("{line}{sep}{sep}{cc}".format(sep=sep, line=line[:].join(","), cc=response.country.iso_code))    # lookup failed for example
+        line.append(response.location.latitude)
+        line.append(response.location.longitude)
+        csvwriter.writerow(line)
