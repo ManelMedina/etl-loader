@@ -5,6 +5,7 @@ in data warehousing applications.
 
 In our case, we need to do a bit more:
   - extract data (gzipped) 
+  - sample data: only print every x'th line (this is an optional step)
   - filter it : remove lines which are not true vulnerable IP addresses (no open recursive nameserver, SNMP, etc)
   - parse the respective format and bring into an internal standardized CSV format
   - enrich the data: add ASN, country code info
@@ -14,14 +15,15 @@ In our case, we need to do a bit more:
 call syntax (snmp data in our case):
 ```
 
-$ zcat infile_snmp.gz | \
+$ zcat infile_snmp.gz | sample.py | \
 $ filter_snmp.py | parse_snmp.py | enrich.py | load.py tablename
 
 ```
 
 A more concrete example would be:
 ```
-$ time zcat data/snmp-data/parsed.20160524.out.gz | head -n 10 | src/parse_snmp.py | src/enrich.py -v -s , -c 2 - | src/load.sh hits
+$ zcat data/snmp-data/parsed.20160524.out.gz | sample.py -n 10 | src/parse_snmp.py > tmp.20160524.out
+$ cat tmp.20160524.out | src/enrich.py -v -s , -c 2 - | src/load.sh hits
 ```
 
 Note the head -n 10 for testing.
