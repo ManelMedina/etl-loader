@@ -86,17 +86,38 @@ if verbose:
 #
 # parse main file
 #
+i=0
+count_no_country=0
+count_unknown_asns=0
 csvreader = csv.reader(infile, delimiter=',', quotechar="'")
 csvwriter = csv.writer(sys.stdout, delimiter=',', quotechar="'") #, quoting=csv.QUOTE_MINIMAL)
 for line in csvreader:
     ip = line[col]
+    i+=1
+    if (not (i % 10000) and verbose):
+        print('.',end="", file=sys.stderr)
+    if (not (i % 1000000) and verbose):
+        print('X',end="", file=sys.stderr)
+
     #if verbose: print("ip={}".format(ip))
     ip = ip.strip()
     if ip:
         rnode = tree.search_best(ip.strip())
-        response = reader.city(ip)
-        line.append(rnode.data['origin'])
-        line.append(response.country.iso_code)
-        line.append(response.location.latitude)
-        line.append(response.location.longitude)
+        if rnode:
+            line.append(rnode.data['origin'])
+        else:
+            line.append('')
+            count_unknown_asns+=1
+        try:
+            response = reader.city(ip)
+            line.append(response.country.iso_code)
+            #line.append(response.location.latitude)
+            #line.append(response.location.longitude)
+        except:
+            line.append('XY')
+            count_no_country+=1
+
         csvwriter.writerow(line)
+
+print("parsed {} lines, could not find {} country places. {} unknown ASNs".format(i,count_no_country, count_unknown_asns), file=sys.stderr)
+
