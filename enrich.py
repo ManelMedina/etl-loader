@@ -4,16 +4,17 @@ import fileinput
 import radix
 import sys
 import argparse
+import csv
 import geoip2.database
 
 
 """
   enrich.py
-  Based on work by 
+  Based on work by
     Job Snijders
     IP 2 ASN converter
   as well as Jared Mauch whom I own a big thank you for support and help
-  
+
   This script does two things to a log line:
     1. specified by the cmd line parameter, it will look for an ip address in a given column of a csv file
     2. extract the ip address and enrich the CSV file by appending
@@ -61,15 +62,18 @@ if args.separator:
 if args.column:
     col = args.column
 
-ip_list = fileinput.input(args.filename)
+infile = fileinput.input(args.filename)
 tree = radix.Radix()
 
 reader = geoip2.database.Reader('./GeoLite2-City.mmdb')
-
+#
+# loading of BGP table
+#
 with open(prefix_table) as f:
     i=0
     for prefix in f.readlines():
         prefix, asn = prefix.strip().split()
+        #if verbose: print ("prefix,asn={prefix},{asn}".format(prefix=prefix,asn=asn), file=sys.stderr)
         rnode = tree.add(prefix)
         rnode.data['origin'] = asn
         i+=1
@@ -78,12 +82,21 @@ with open(prefix_table) as f:
 if verbose:
     print ("prefix tree loaded", file=sys.stderr)
 
-for ip in ip_list:
+
+#
+# parse main file
+#
+csvreader = csv.reader(infile, delimiter=',', quotechar="'")
+for line in csvreader:
+    ip = line[col]
+    if verbose: print("ip={}".format(ip))
     ip = ip.strip()
     if ip:
         rnode = tree.search_best(ip.strip())
         response = reader.city(ip)
+        line.append(rnode.data['origin'])
+        line.append(response.country.iso_code)
         try:
-            print("{ip}{sep}{asn}{sep}{cc}".format(sep=sep, ip=ip, asn=rnode.data['origin'], cc=response.country.iso_code))
+            print("{line}{sep}{asn}{sep}{cc}".format(sep=sep, line=linein(","), asn=rnode.data['origin'], cc=response.country.iso_code))
         except AttributeError:
-            print("{ip}{sep}0{sep}{cc}".format(sep=sep, ip=ip, cc=response.country.iso_code))    # lookup failed for example
+            print("{line}{sep}{sep}{cc}".format(sep=sep, line=line[:].join(","), cc=response.country.iso_code))    # lookup failed for example
