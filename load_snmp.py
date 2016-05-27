@@ -1,21 +1,9 @@
 #!/usr/bin/env python
 
+"""
+ No operation for now
+ For snmp data we can do that with a simple sh script:
+ psql iphistory -c "copy hits (ts,risk_id,ip,asn,\"place.cc\") from  STDIN delimiters ',' csv quote '''';" < infile
 
-import sys
-import argparse
-import psycopg2
-
-# input file format:
-#  Date, Country, Value, Normalized
-# example:
-#  2016,CN,818951
-#  2016,IN,725405
-#  2016,IR,613830
-
-# call syntax:
-#  filter.py < infile | parse.py | enrich.py | load.py tablename
-# then aggregate from DB:
-#  aggregate.sh 
-#
-
+"""
 
