@@ -1,11 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 from __future__ import print_function
-import fileinput
-import radix
 import sys
 import argparse
 import csv
-import geoip2.database
 
 
 sep=","
