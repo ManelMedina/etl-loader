@@ -75,7 +75,7 @@ with open(prefix_table) as f:
         prefix, asn = prefix.strip().split()
         #if verbose: print ("prefix,asn={prefix},{asn}".format(prefix=prefix,asn=asn), file=sys.stderr)
         rnode = tree.add(prefix)
-        rnode.data['origin'] = asn
+        rnode.data['origin'] = int(asn)
         i+=1
         if (not (i % 10000) and verbose):
             print('.',end="", file=sys.stderr)
