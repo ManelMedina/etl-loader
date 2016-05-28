@@ -1,11 +1,14 @@
 #!/usr/bin/python
 from __future__ import print_function
+import fileinput
+import radix
 import sys
 import argparse
 import csv
+import geoip2.database
 
 
-sep=":"
+sep=","
 verbose = False
 col=7
 
@@ -29,23 +32,25 @@ infile = sys.stdin
 i=0
 count_filtered=0
 count_passed=0
-csvreader = csv.reader(infile, delimiter=sep, quotechar="'")
-csvwriter = csv.writer(sys.stdout, delimiter=sep, quotechar="'") #, quoting=csv.QUOTE_MINIMAL)
+csvreader = csv.reader(infile, delimiter=sep, quotechar="\"")
+csvwriter = csv.writer(sys.stdout, delimiter=sep, quotechar="\"") #, quoting=csv.QUOTE_MINIMAL)
 
-# format:
-#  IP1:53:64.21.0.0:NULL:1367107201.262564:0:0:0
-#      |  |         |    |                 | | |-> correct
-#      |  |         |    |                 | .--> ra
-#      |  |         |    |                 .--> rcode
-#      |  |         |    .---> timestamp (UTC, epoch)
-#      |  |         .----> secondary IP
-#      |  .---> primary IP
-#      .------> port
+"""
+format:
+ 1376311564.88869,46.224.245.12,1939,"New Trade Idea, news is expected!"
+ 1376312007.42352,197.249.22.162,5093,Dr. Oz Fat Burner Revealed
+    |              |              |     |
+    |              |              |     .---> subject of email
+    |              |              .---> size in bytes of email
+    |              .----> IP address of spam relay (mail server)  
+    .----> timestamp (UTC) epoch
+
+"""
 
 # strategy:
 # filter out everytihng which is not correct
 for line in csvreader:
-    correct = line[col]
+    correct = True
     i+=1
     if (not (i % 10000) and verbose):
         print('.',end="", file=sys.stderr)
