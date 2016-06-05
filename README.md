@@ -39,3 +39,8 @@ $ gen-summary.sh
 
 
 
+# How to run the ETL process?
+
+Take a look at run.sh, adapt and run it.
+
+
