@@ -11,7 +11,7 @@
 
 declare -A risks=( ["1"]="opendns" ["2"]="openntp" ["3"]="spam" ["4"]="opensnmp" ["5"]="openssdp" )
 
-rate=1000
+rate=10
 YEAR="1=1"
 YEAR="ts >= date('2016-01-01')"
 YEAR2="1=1"
@@ -52,4 +52,4 @@ echo "select risk.name as risk_name, lower(\"place.cc\") as country, extract(yea
 	psql -t -F"," -A iphistory > $outfile
 
 outfile="places.csv"
-src/extract_places.py all-place-annual.csv > $outfile
+./extract_places.py all-place-annual.csv > $outfile
