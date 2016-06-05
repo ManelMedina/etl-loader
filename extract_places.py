@@ -79,6 +79,6 @@ for cc in ccs:
 
 
 # dump result
-writer = csv.writer(sys.stdout, delimiter=",")
-writer.writerows(sorted(score.items(), key=operator.itemgetter(1)))
+writer = csv.writer(sys.stdout, delimiter=",", dialect=csv.excel)
+writer.writerows(sorted(score.items(), key=operator.itemgetter(1), reverse=True))
 
